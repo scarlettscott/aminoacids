@@ -1,2 +1,2 @@
 # Dietary protein and amino acid intakes 
-Analysis of dietary protein and amino acid intakes, and determination of protein inadequacy among age, sex, and dietary groups in a representative sample of the UK population: A secondary data analysis
+Analysis of dietary protein and amino acid intakes, and determination of protein inadequacy among age, sex, and dietary groups in a representative sample of the UK population.
