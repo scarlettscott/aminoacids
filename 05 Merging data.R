@@ -8,18 +8,35 @@
 
 
 # 1) Merge USDA AA data with NDNS 
+ndns4$TotalGrams <- as.numeric(ndns4$TotalGrams)
+ndns4$Waterg <- as.numeric(ndns4$Waterg)
+ndns4$Proteing <- as.numeric(ndns4$Proteing)
 
 NDNS_USDA <- ndns4 %>% 
   left_join(Avg_AA_60_SFG, by = 'SubFoodGroupCode')
 
 
 # 2) Merge NPD AA data 
-#Merge NPD_merged with NDNS_USDA by foodnumber
-NDNS_USDA_NPD <- NDNS_USDA %>% 
-  left_join(NPD_merged, by = 'FoodNumber')
+#Merge NPD AA data with NDNS_USDA by FoodNumber
+
+#Calculate dry weight and protein per g for just NPDs
+NPDs_dryweight <- NDNS_USDA %>%
+  mutate(
+    dry_weight = if_else(SubFoodGroupCode == "50E",
+                         TotalGrams - Waterg, NA_real_),
+    Protein_g1g = if_else(SubFoodGroupCode == "50E",
+                          Proteing/dry_weight, NA_real_))
+#Check
+NPDs_dryweight %>% filter(SubFoodGroupCode=='50E') %>% View()
+
+#Match AA composition data 
+NPD_merged <- NPDs_dryweight %>% left_join(NPD_AA_match, by = 'FoodNumber')
+
+#Check
+NPD_merged %>% filter(SubFoodGroupCode=='50E') %>% View()
 
 #Calculate true AA consumption 
-NDNS_USDA_NPD <- NDNS_USDA_NPD %>% 
+NDNS_USDA_NPD <- NPD_merged %>% 
   mutate(
   LEUg = (Protein_g1g * Leucine_g1g.protein),
   ILEg = (Protein_g1g * Isoleucine_g1g.protein),

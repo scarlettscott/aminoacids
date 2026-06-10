@@ -211,7 +211,8 @@ Dailyintakes %>% filter(Sex==1 & AgeGrp == 'Adult') %>%
 #Notes: 0 values for daily intakes? 101103281 (water only), 900209122 (water only), 900801131 (water only). Could the survey have aligned with Ramadan? 
 completedata %>% filter(seriali=='900803131') %>% View()
 
-#####################################################################
+#STOP HERE FOR NOW 
+############################################################################
 # 6) Calculate Goldberg cut-offs to exclude low energy intakes
 
 # Goldberg cut offs: Energy intake:Basal metabolic rate

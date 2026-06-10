@@ -41,27 +41,6 @@ View(NPD_AA_match)
 NPD_AA_match <- NPD_AA_match %>% select(-FoodName)
 
 
-#####################
-#Preparing to merge with ndns
-
-ndns4$TotalGrams <- as.numeric(ndns4$TotalGrams)
-ndns4$Waterg <- as.numeric(ndns4$Waterg)
-ndns4$Proteing <- as.numeric(ndns4$Proteing)
-
-#Calculate dry weight and protein per g for just NPDs
-NPDs_dryweight <- ndns4 %>% filter(SubFoodGroupCode=='50E') %>% 
-  mutate(
-    NPD = SubFoodGroupCode == "50E",
-    dry_weight = if_else(NPD, TotalGrams - Waterg, NA_real_),
-    Protein_g1g = if_else(NPD, Proteing/dry_weight, NA_real_))
-
-#Select variables for merging with NPD compositions
-NPDs_dryweight_only <- NPDs_dryweight %>% select(
-  FoodNumber, dry_weight, Protein_g1g)
-
-#Match AA composition data 
-NPD_merged <- NPDs_dryweight_only %>% left_join(NPD_AA_match, by = 'FoodNumber')
-
 
 
 
