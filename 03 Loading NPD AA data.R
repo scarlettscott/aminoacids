@@ -1,7 +1,7 @@
 #Match NPD AA from paper to Food_match_AA
 library(tidyr)
 
-#View NPDs by frequency of consumption
+#View NPDs by frequency of consumption 
 ndns4 %>% filter(SubFoodGroupCode=='50E') %>% 
   group_by(FoodName) %>% 
   summarise(Frequency = n ()) %>% 

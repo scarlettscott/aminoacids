@@ -2,6 +2,31 @@
 .Rhistory
 .RData
 .Ruserdata
+<<<<<<< HEAD
 # Data folder
 
 data/
+=======
+
+# Ignoring data folders
+data/
+UK-NDNS-main/
+Plots/
+
+# Ignoring csv xlsx
+*.csv
+*.xlsx
+
+
+#Ignoring example R files
+R - loading data.R
+Exploring data.R 
+Loading data.R
+
+#Ignoring working files
+AA intakes.R
+AA_digestibility_data.R
+Amino Acids.Rproj
+Protein_source.R
+Project.R
+>>>>>>> d48af3f988e8cfa100d57cd5160254ab61fc83dd

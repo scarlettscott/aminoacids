@@ -18,7 +18,7 @@ NDNS_USDA <- ndns4 %>%
 NDNS_USDA_NPD <- NDNS_USDA %>% 
   left_join(NPD_merged, by = 'FoodNumber')
 
-#Calculate true AA consumption
+#Calculate true AA consumption 
 NDNS_USDA_NPD <- NDNS_USDA_NPD %>% 
   mutate(
   LEUg = (Protein_g1g * Leucine_g1g.protein),

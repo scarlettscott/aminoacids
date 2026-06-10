@@ -233,7 +233,7 @@ determine_diet <- function(diets){
 
 
 #View diet group changes
-DietGrp_summary <- DietGrp %>% 
+DietGrp_summary <- DietGrp %>%  
   group_by(seriali, Veg) %>% 
   summarize(Overall_Diet = determine_diet(Diet)) %>% ungroup()
 
