@@ -43,7 +43,7 @@ Food_match_AA <- Food_match %>%
          fdc_id)
 
 write.csv(here::here("data",
-                     "ID_nos.csv"))
+                     "ID_nos.csv")) 
 
 ### Use US19 to obtain AA data for all matches 
 # Select relevant AA data from US19 

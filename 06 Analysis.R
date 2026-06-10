@@ -43,7 +43,7 @@ ggsave(filename = "Plots/New Plots/SFG_protein.jpg")
 data$facet_var <- reorder(data$facet_var, -ave(data$value, data$facet_var, FUN = sum))
 
 #######################################################################
-# 2) Average protein consumption per person per day
+# 2) Average protein consumption per person per day 
 ## Need to work out descending order. Not currently in descending order. 
 
 NDNS_USDA_NPD %>%
