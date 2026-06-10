@@ -6,41 +6,39 @@ options(scipen = 999) #Off the scientific notation
 # 0 Loading & preparing the data
 
 # Finding the files from NDNS for dietary data
-files <- list.files(path = here::here("UK-NDNS-main/data/tab"),
+files <- list.files(path = here::here("data/tab"),
                     pattern = "foodleveldietarydata") %>% 
   stringr::str_subset(., "9|10|11")
 
 # Loading the 3 years of survey together
 
-ndns <- paste0(here::here("UK-NDNS-main/data/tab//"), files) %>% 
+ndns <- paste0(here::here("data/tab//"), files) %>% 
   purrr::map_df(~readr::read_delim(., col_types = readr::cols(.default = "c"), 
                                    delim='\t',  locale = readr::locale(encoding = "Latin1"))) 
 # Food consumption 
 ndns$TotalGrams <- as.numeric(ndns$TotalGrams)
+ndns$Proteing <- as.numeric(ndns$Proteing)
 
 #Loading individual data
-ind <- readr::read_delim(here::here("UK-NDNS-main/data", "tab", "ndns_rp_yr9-11a_indiv_20211020.tab"),
+ind <- readr::read_delim(here::here("data", "tab", "ndns_rp_yr9-11a_indiv_20211020.tab"),
                          delim = "\t")
 
 # Checking main food groups supplying pro
 
 ndns %>% 
-  group_by(seriali, SurveyYear, DayNo, AgeR, Sex, Country,
-           # DiaryDate, DayofWeek, DayNo, 
-           FoodName, FoodNumber, SubFoodGroupCode,
-           SubFoodGroupDesc, MainFoodGroupCode, MainFoodGroupDesc) %>% 
-  # ggplot(aes(forcats::fct_reorder(MainFoodGroupDesc, Proteing), Proteing)) + 
   ggplot(aes(forcats::fct_reorder(MainFoodGroupDesc, Proteing), Proteing)) + 
   geom_boxplot() + coord_flip()
 
 
 # Getting average consumption per person per food subgroup (top 60) (for matching)
+# NOTE: I added the DayNo, as I think it makes more sense to calculate/inform portions (per day)
+# See the TotalGrams in the table below.
 
 ndns %>% #average food consumption per person per day
-  select(seriali, MainFoodGroupCode, MainFoodGroupDesc, SubFoodGroupCode, 
+  select(seriali, DayNo, MainFoodGroupCode, MainFoodGroupDesc, SubFoodGroupCode, 
          SubFoodGroupDesc, TotalGrams, Proteing) %>% 
-  #group by person, food groups
-  group_by(seriali, SubFoodGroupCode, SubFoodGroupDesc) %>% 
+  #group by person, day, food groups
+  group_by(seriali, DayNo, SubFoodGroupCode, SubFoodGroupDesc) %>% 
   #sum per SFG for each individual
   summarise(across(where(is.numeric), ~sum(.x, na.rm = TRUE)), .groups = 'drop') %>% 
   #group by SFG 
@@ -48,13 +46,13 @@ ndns %>% #average food consumption per person per day
   #summarise to get median protein per group 
   summarise(across(where(is.numeric), ~median(.x, na.rm = TRUE)), .groups = 'drop') %>% 
   #arrange by protein supply
-  arrange(desc(Proteing)) %>% ungroup() %>% View()
+  arrange(desc(Proteing)) %>% ungroup() %>% # View()
 #select top 60
 slice_head(n=60)  %>%
   #view in plot SFG, Protein
   ggplot(aes(forcats::fct_reorder(SubFoodGroupDesc, Proteing), Proteing)) + 
   geom_boxplot() + coord_flip() +
-  scale_y_continuous(breaks = seq(0, max(ndns2$Proteing), by = 1)) + 
+  scale_y_continuous(breaks = seq(0, max(ndns$Proteing), by = 1)) + # Here you were calling a dataset that it's not available
   labs(title = 'Average consumption per person per SFG',
        x = 'SFG',
        y = 'Proteing')
@@ -62,10 +60,10 @@ slice_head(n=60)  %>%
 
 # Table format: 
 ndns %>% #average food consumption per person per day
-  select(seriali, MainFoodGroupCode, MainFoodGroupDesc, SubFoodGroupCode, 
+  select(seriali, DayNo, MainFoodGroupCode, MainFoodGroupDesc, SubFoodGroupCode, 
          SubFoodGroupDesc, TotalGrams, Proteing) %>% 
   #group by person, food groups
-  group_by(seriali, SubFoodGroupCode, SubFoodGroupDesc) %>% 
+  group_by(seriali, DayNo, SubFoodGroupCode, SubFoodGroupDesc) %>% 
   #sum per SFG for each individual
   summarise(across(where(is.numeric), ~sum(.x, na.rm = TRUE)), .groups = 'drop') %>% 
   #group by SFG 
@@ -92,19 +90,19 @@ ndns2 <- ndns %>%
   left_join(ind2, by = "seriali")
 
 #Checking main vegetarian food groups supplying protein
-##Error 
+## Same as above - Added DayNo. (per day) 
 ndns2 %>% filter(Veg==2) %>% #average consumption per vegetarian person per day 
   #select variables of interest
-  select(seriali, MainFoodGroupCode, MainFoodGroupDesc,SubFoodGroupCode, 
+  select(seriali, DayNo, MainFoodGroupCode, MainFoodGroupDesc,SubFoodGroupCode, 
          SubFoodGroupDesc,TotalGrams, Proteing) %>% 
-  #group by person, food groups (total grams and protein?)
-  group_by(seriali, MainFoodGroupCode, MainFoodGroupDesc,
+  #group by person, day, food groups (total grams and protein?)
+  group_by(seriali, DayNo, MainFoodGroupCode, MainFoodGroupDesc,
            SubFoodGroupCode, SubFoodGroupDesc) %>% 
   #sum by SFG for each veg individual
   summarise(across(where(is.numeric), ~sum(.x, na.rm = TRUE)), .groups = 'drop') %>% 
   #group by SFG
   group_by(SubFoodGroupCode, SubFoodGroupDesc) %>% 
-  #calculate median protein per person 
+  #calculate median protein consumption 
   summarise(across(where(is.numeric), ~median(.x, na.rm = TRUE)), .groups = 'drop') %>% 
   #arrange desc(P)
   arrange(desc(Proteing)) %>% ungroup() %>% slice_head(n=20) %>% View()
@@ -145,7 +143,8 @@ pesc_keywords_foodnames <- c("COD LIVER OIL",
                              "FISH OIL",
                              "FISH",
                              "FOREVER ARTIC SEA",
-                             "OMEGA 3")
+                             "OMEGA 3"  # This may exclude some supplements for vegans!
+                            )
 
 vegetarian_keywords <- c("EGGS AND EGG DISHES",
                          "YOGURT")
@@ -250,7 +249,8 @@ DietGrp2 %>% filter(Overall_Diet=='Vegan') %>% View()
 ndns3 <- ndns2 %>% 
   left_join(DietGrp2, by = "seriali")
 
-write.csv(here::here("data", 
+write.csv(ndns3, here::here("data", "inter-outputs", # It was missing the dataset. I also added a subfolder so the datasets that you create are not mixed with the origina (raw) data
+
                      "ndns_dietgroups.csv"))
 
 
@@ -265,7 +265,8 @@ ndns4 <- ndns3 %>% left_join(ind3, by = "seriali")
 
 demographics <- DietGrp_summary %>% 
   left_join(ind3, by = "seriali")
-write.csv(here::here("data", 
+
+write.csv(demographics, here::here("data", "inter-outputs", # Same as in line 252
                      "demographics.csv"))
 
 
