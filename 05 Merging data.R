@@ -57,7 +57,7 @@ NDNS_USDA_NPD_DIG <- NDNS_USDA_NPD %>%
   left_join(Digest_coef, by = 'SubFoodGroupCode')
 
 #Multiply digestibility coefficients with composition data to obtain digestible AA composition 
-NDNS_USDA_NPD_DIG <- NDNS_USDA_NPD_DIG %>% 
+completedata <- NDNS_USDA_NPD_DIG %>% 
   mutate(
     Digest_Proteing = Protein_coef * Proteing,
     Digest_TRPg = TRP_coef * TRPg,
