@@ -9,13 +9,33 @@
 
 # 1) Merge USDA AA data with NDNS 
 
+ndns4 |> count(MainFoodGroupDesc, SubFoodGroupCode)
+
 NDNS_USDA <- ndns4 %>% 
   left_join(Avg_AA_60_SFG, by = 'SubFoodGroupCode')
+
+length(unique(NDNS_USDA$MainFoodGroupCode))
+
+NDNS_USDA |> filter(Proteing>1) |> 
+  group_by(MainFoodGroupCode,MainFoodGroupDesc) |> 
+  summarise(Leu_T = mean(LEUg, na.rm = TRUE), 
+            cons = mean(TotalGrams, na.rm = TRUE),
+            prot = mean(Proteing, na.rm = TRUE)) |> 
+  filter(is.na(Leu_T)) |> arrange(desc(prot))
 
 sum(!is.na(NDNS_USDA$LEUg))
 sum(is.na(NDNS_USDA$Proteing))
 
 NDNS_USDA |> filter(SubFoodGroupCode == "1R")
+NDNS_USDA |> filter(MainFoodGroupCode == "51") |> 
+  distinct(SubFoodGroupDesc)
+
+NDNS_USDA |> filter(MainFoodGroupCode == "51" & Proteing >1) 
+
+NDNS_USDA |> filter(MainFoodGroupCode == "51" & 
+                      grepl("MILK", FoodName))  |>
+  filter(!grepl("NO MILK", FoodName)) |> 
+  distinct(FoodName)
 
 class(NDNS_USDA$Proteing)
 
@@ -32,14 +52,16 @@ NDNS_USDA_NPD <- NDNS_USDA %>%
 #Calculate true AA consumption - This is wrong, you are overwriting LEUg
 NDNS_USDA_NPD <- NDNS_USDA_NPD %>% 
   mutate(
-  LEUg = (Protein_g1g * Leucine_g1g.protein),
-  ILEg = (Protein_g1g * Isoleucine_g1g.protein),
-  VALg = (Protein_g1g * Valine_g1g.protein),
-  LYSg = (Protein_g1g * Lysine_g1g.protein),
-  METg = (Protein_g1g * Methionine_g1g.protein),
-  HISg = (Protein_g1g * Histidine_g1g.protein),
-  PHEg = (Protein_g1g * Phenylalanine_g1g.protein),
-  THRg = (Protein_g1g * Threonine_g1g.protein))
+  LEUg = ifelse(is.na(LEUg), (Protein_g1g * Leucine_g1g.protein), LEUg),
+  ILEg = ifelse(is.na(ILEg)(Protein_g1g * Isoleucine_g1g.protein),ILEg),
+  VALg = ifelse(is.na(VALg)(Protein_g1g * Valine_g1g.protein),VALg),
+  LYSg = ifelse(is.na(LYSg)(Protein_g1g * Lysine_g1g.protein),LYSg),
+  METg = ifelse(is.na(METg)(Protein_g1g * Methionine_g1g.protein),METg),
+  HISg = ifelse(is.na(HISg)(Protein_g1g * Histidine_g1g.protein),HISg),
+  PHEg = ifelse(is.na(PHEg)(Protein_g1g * Phenylalanine_g1g.protein),PHEg),
+  THRg = ifelse(is.na(THRg)(Protein_g1g * Threonine_g1g.protein), THRg))
+
+
 
 #Check 
 #NDNS_USDA_NPD %>% filter(SubFoodGroupCode=='50E') %>% View()
