@@ -53,13 +53,13 @@ NDNS_USDA_NPD <- NDNS_USDA %>%
 NDNS_USDA_NPD <- NDNS_USDA_NPD %>% 
   mutate(
   LEUg = ifelse(is.na(LEUg), (Protein_g1g * Leucine_g1g.protein), LEUg),
-  ILEg = ifelse(is.na(ILEg)(Protein_g1g * Isoleucine_g1g.protein),ILEg),
-  VALg = ifelse(is.na(VALg)(Protein_g1g * Valine_g1g.protein),VALg),
-  LYSg = ifelse(is.na(LYSg)(Protein_g1g * Lysine_g1g.protein),LYSg),
-  METg = ifelse(is.na(METg)(Protein_g1g * Methionine_g1g.protein),METg),
-  HISg = ifelse(is.na(HISg)(Protein_g1g * Histidine_g1g.protein),HISg),
-  PHEg = ifelse(is.na(PHEg)(Protein_g1g * Phenylalanine_g1g.protein),PHEg),
-  THRg = ifelse(is.na(THRg)(Protein_g1g * Threonine_g1g.protein), THRg))
+  ILEg = ifelse(is.na(ILEg),(Protein_g1g * Isoleucine_g1g.protein),ILEg),
+  VALg = ifelse(is.na(VALg),(Protein_g1g * Valine_g1g.protein),VALg),
+  LYSg = ifelse(is.na(LYSg),(Protein_g1g * Lysine_g1g.protein),LYSg),
+  METg = ifelse(is.na(METg),(Protein_g1g * Methionine_g1g.protein),METg),
+  HISg = ifelse(is.na(HISg),(Protein_g1g * Histidine_g1g.protein),HISg),
+  PHEg = ifelse(is.na(PHEg),(Protein_g1g * Phenylalanine_g1g.protein),PHEg),
+  THRg = ifelse(is.na(THRg),(Protein_g1g * Threonine_g1g.protein), THRg))
 
 
 
