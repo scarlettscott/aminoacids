@@ -1,6 +1,6 @@
 
 #Load digestibility data (matched with NDNS top 60 and respective USDA matches)
-Digest_matches <- read_csv("Matched_NDNS_USDA_DIAAS_22_04_2025.csv")
+Digest_matches <- read_csv(here::here("data", "Matched_NDNS_USDA_DIAAS_22_04_2025.csv"))
 
 #Remove unnecessary columns and drop empty 
 Digest_matches <- Digest_matches %>% select(

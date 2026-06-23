@@ -1,17 +1,19 @@
 ## To provide SubFoodGroupCode to collect AA information from FoodData Central database
-install.packages("zoo")
+# install.packages("zoo")
 
 library(zoo)
+library(dplyr) # Good practice to start the script with the libraries that will be used same for the data!
+library(readr)
 
-Data <- Food_match %>%  select(SubFoodGroupCode, `NDB no`, `FDC Id`) %>% 
-  filter(!is.na(`NDB no`)) %>% mutate(SubFoodGroupCode=zoo::na.locf(SubFoodGroupCode))
-
-write.csv(Data, "Food_ID.csv", row.names = FALSE)
-
-Data$SubFoodGroupCode <- na.locf(Data$SubFoodGroupCode)
-
-tail(Data)
-
+# Data <- Food_match %>%  select(SubFoodGroupCode, `NDB no`, `FDC Id`) %>% 
+#   filter(!is.na(`NDB no`)) %>% mutate(SubFoodGroupCode=zoo::na.locf(SubFoodGroupCode))
+# 
+# write.csv(Data, "Food_ID.csv", row.names = FALSE)
+# 
+# Data$SubFoodGroupCode <- na.locf(Data$SubFoodGroupCode)
+# 
+# tail(Data)
+# 
 #############################################################################################
 # Load AA Data 
 library(readr)
@@ -28,8 +30,9 @@ library(tidyr)
        #usda_desc=`USDA Item Description`)
 
 #Load matching data without NPD (matched separately from paper)
-Food_match <- read_csv("Matched_NDNS_USDA_18_08_2025_NPD.csv")
-View(Food_match)
+Food_match <- read_csv(here::here("data" ,"Matched_NDNS_USDA_18_08_2025_NPD.csv"))
+#View(Food_match)
+names(Food_match)
 Food_match <- Food_match %>% 
   rename(fdc_id = `FDC Id`,
          ndb_no =`NDB no`,
@@ -47,17 +50,20 @@ write.csv(here::here("data",
 
 ### Use US19 to obtain AA data for all matches 
 # Select relevant AA data from US19 
-usda_matches <- read_csv("US19_FCT_FAO_Tags.csv")
-View(usda_matches)
+usda_matches <- read_csv(here::here("data", "US19_FCT_FAO_Tags.csv"), # Missing here::here for correct path and encoding issue
+                         locale = locale(encoding = "latin1"))
+names(usda_matches)
+
 
 usda_matches <- usda_matches %>% 
-  select(fdc_id, TRPg, THRg, ILEg, LEUg, LYSg, METg, CYSg, PHEg, TYRg, VALg, ARGg, HISg, ALAg, ASPg, GLUg, GLYg, PROg, SERg)
+  select(fdc_id, TRPg, THRg, ILEg, LEUg, LYSg, METg, CYSg, PHEg, TYRg, VALg,
+         ARGg, HISg, ALAg, ASPg, GLUg, GLYg, PROg, SERg)
 
 
 # Join USDA AA data to NDNS-USDA food match data
 #Match USDA AA data to NDNS matches
 Food_match_AA <- Food_match_AA %>% 
-  left_join(usda_matches, by = 'fdc_id')
+  left_join(usda_matches, by = c("ndb_no" = 'fdc_id'))
 View(Food_match_AA)
 
 Food_match_AA <- Food_match_AA %>% 

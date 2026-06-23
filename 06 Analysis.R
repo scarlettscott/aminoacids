@@ -1,5 +1,5 @@
 
-
+library(ggplot2)
 
 # 1) View top 20 food groups supplying protein to each dietary group
 
@@ -10,10 +10,10 @@
 ndns4 %>% #average food consumption per person per day
   #filter(Overall_Diet=='Vegan') %>% 
   filter(as.numeric(AgeR) > 5 ) %>%
-  select(seriali, MainFoodGroupCode, MainFoodGroupDesc, SubFoodGroupCode, 
+  select(seriali, DayNo,MainFoodGroupCode, MainFoodGroupDesc, SubFoodGroupCode, # Added day so it's in line with the graph 
          SubFoodGroupDesc, TotalGrams, Proteing, Overall_Diet) %>% 
   #group by person, food groups
-  group_by(seriali, SubFoodGroupCode, SubFoodGroupDesc, Overall_Diet) %>% 
+  group_by(seriali, SubFoodGroupCode,DayNo, SubFoodGroupDesc, Overall_Diet) %>%  # Added day so it's in line with the graph 
   #sum per SFG for each individual
   summarise(across(where(is.numeric), ~sum(.x, na.rm = TRUE)), .groups = 'drop') %>% 
   #group by SFG 
